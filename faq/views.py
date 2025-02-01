@@ -4,6 +4,9 @@ from .serializers import FAQSerializer
 from django.core.cache import cache
 from django.shortcuts import render, redirect
 from .forms import FAQForm
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404, redirect
 
 
 
@@ -46,3 +49,11 @@ def add_faq(request):
     else:
         form = FAQForm()
     return render(request, 'faq/add_faq.html', {'form': form})
+
+
+@require_POST
+@csrf_exempt  # Only use this if you're not using Django's CSRF middleware
+def delete_faq(request, faq_id):
+    faq = get_object_or_404(FAQ, id=faq_id)
+    faq.delete()
+    return redirect('faq-list')  # Redirect to the FAQ list page after deletion

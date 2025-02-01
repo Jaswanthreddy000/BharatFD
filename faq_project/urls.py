@@ -32,6 +32,7 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),  # CKEditor URLs
     path('', views.faq_list, name='faq-list'),  # FAQ list page
     path('add/', views.add_faq, name='add-faq'),  # Add FAQ page
+    path('delete/<int:faq_id>/', views.delete_faq, name='delete-faq'),  # Delete FAQ
     # path('', RedirectView.as_view(url='/api/')),
 ]
 

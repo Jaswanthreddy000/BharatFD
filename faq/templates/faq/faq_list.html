@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+        }
+        .faq-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .faq-answer {
+            margin-left: 20px;
+        }
+        .language-selector {
+            margin-bottom: 20px;
+        }
+        .add-faq-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .add-faq-link:hover {
+            background-color: #45a049;
+        }
+        .delete-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #ff4d4d;
+        }
+        .delete-icon:hover {
+            color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Frequently Asked Questions</h1>
+
+    <a href="{% url 'add-faq' %}" class="add-faq-link">Add New FAQ</a>
+
+    <div class="language-selector">
+        <label for="language">Select Language:</label>
+        <select id="language" onchange="changeLanguage()">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="bn">Bengali</option>
+        </select>
+    </div>
+
+    <div id="faq-list">
+        {% for faq in faqs %}
+            <div class="faq-item">
+                <span class="delete-icon" data-url="{% url 'delete-faq' faq.id %}" onclick="confirmDelete(this)">🗑️</span>
+                <div class="faq-question">
+                    <span>Question : </span>{{ faq.question }}</div>
+                <div class="faq-answer">
+                    <span>Answer : </span>{{ faq.answer|safe }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function changeLanguage() {
+            const lang = document.getElementById('language').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('lang', lang);
+            window.location.search = urlParams.toString();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const lang = urlParams.get('lang') || 'en';
+        document.getElementById('language').value = lang;
+
+        function confirmDelete(element) {
+            const deleteUrl = element.dataset.url;
+            if (confirm('Are you sure you want to delete this FAQ?')) {
+                // Handle delete using AJAX for CSRF protection (Important!)
+                fetch(deleteUrl, {
+                    method: 'POST', // Or DELETE, depending on your view
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
+                        'Content-Type': 'application/json' // Or appropriate content type if needed
+                    },
+                    // You can include a body if your view expects data (e.g., JSON)
+                    // body: JSON.stringify({}), 
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // FAQ deleted successfully, remove from the page
+                        element.parentElement.remove(); // Remove the FAQ item
+                        // Or reload the page: window.location.reload();
+                    } else {
+                        // Handle errors (e.g., display an error message)
+                        console.error('Error deleting FAQ:', response.status);
+                        alert("Error deleting the FAQ. Please try again.")
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting FAQ:', error);
+                    alert("An error occurred. Please try again later.")
+                });
+            }
+        }
+
+        // Helper function to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
