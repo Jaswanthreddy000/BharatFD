@@ -1,5 +1,4 @@
-# .flake8 configuration file
 [flake8]
-max-line-length = 88  # Set the maximum allowed line length (PEP 8 recommends 79, but 88 is commonly used)
-exclude = migrations, venv, __pycache__  # Exclude these directories from linting
-ignore = E203, E266, E501, W503  # Ignore specific warnings
+max-line-length = 88
+exclude = migrations, venv, __pycache__
+ignore = E203, E266, E501, W503

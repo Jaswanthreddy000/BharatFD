@@ -28,9 +28,11 @@ router.register(r'faqs', views.FAQViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('', RedirectView.as_view(url='/api/')),
+    path('api/', include(router.urls)),  # API routes
+    path('ckeditor/', include('ckeditor_uploader.urls')),  # CKEditor URLs
+    path('', views.faq_list, name='faq-list'),  # FAQ list page
+    path('add/', views.add_faq, name='add-faq'),  # Add FAQ page
+    # path('', RedirectView.as_view(url='/api/')),
 ]
 
 # Serve media files in development
