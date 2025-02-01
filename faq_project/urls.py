@@ -21,6 +21,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from faq import views
 
+from django.views.generic import RedirectView
+
 router = DefaultRouter()
 router.register(r'faqs', views.FAQViewSet)
 
@@ -28,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('', RedirectView.as_view(url='/api/')),
 ]
 
 # Serve media files in development
