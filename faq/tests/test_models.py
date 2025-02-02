@@ -26,7 +26,7 @@ def test_faq_model_translation():
 
     # ✅ Test Bengali translation
     assert faq.get_translated_question('bn') == "জ্যাঙ্গো কী?"
-    assert faq.get_translated_answer('bn') == "জ্যাঙ্গো একটি ওয়েব ফ్రేమওয়ার్క।"
+    assert faq.get_translated_answer('bn') == "জ্যাঙ্গো একটি ওয়েব ফ্রেমওয়ার্ক।"
 
     # ✅ Test Telugu translation
     assert faq.get_translated_question('te') == "డ్జాంగో అంటే ఏమిటి?"
