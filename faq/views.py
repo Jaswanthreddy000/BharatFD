@@ -3,6 +3,7 @@ from .models import FAQ
 from .serializers import FAQSerializer
 from django.core.cache import cache
 from django.shortcuts import render, redirect
+from rest_framework.response import Response
 from .forms import FAQForm
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
