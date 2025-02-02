@@ -26,35 +26,63 @@ from django.shortcuts import get_object_or_404, redirect
 #                 faq.answer = faq.get_translated_answer(lang)
 #             cache.set(cache_key, queryset, timeout=60 * 15)  # Cache for 15 minutes
 #         return queryset
+# class FAQViewSet(viewsets.ModelViewSet):
+#     queryset = FAQ.objects.all()
+#     serializer_class = FAQSerializer
+
+#     def get_queryset(self):
+#         lang = self.request.query_params.get('lang', None)
+#         cache_key = f'faqs_{lang}' if lang else 'faqs_all'
+
+#         queryset = cache.get(cache_key)
+
+#         if not queryset:
+#             queryset = FAQ.objects.all()
+
+#             # Filter translations if a language is specified
+#             if lang:
+#                 for faq in queryset:
+#                     faq.question = faq.get_translated_question(lang)
+#                     faq.answer = faq.get_translated_answer(lang)
+
+#             cache.set(cache_key, queryset, timeout=60 * 15)  # Cache for 15 minutes
+
+#         return queryset
+
+#     def retrieve(self, request, *args, **kwargs):
+#         # Override the retrieve method to include all translations for a single FAQ
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance)
+#         return Response(serializer.data)
+
 class FAQViewSet(viewsets.ModelViewSet):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
 
     def get_queryset(self):
-        lang = self.request.query_params.get('lang', None)
-        cache_key = f'faqs_{lang}' if lang else 'faqs_all'
-
+        lang = self.request.query_params.get('lang', 'en')
+        cache_key = f'faqs_{lang}'
         queryset = cache.get(cache_key)
-
         if not queryset:
             queryset = FAQ.objects.all()
-
             # Filter translations if a language is specified
             if lang:
                 for faq in queryset:
                     faq.question = faq.get_translated_question(lang)
                     faq.answer = faq.get_translated_answer(lang)
-
             cache.set(cache_key, queryset, timeout=60 * 15)  # Cache for 15 minutes
-
         return queryset
 
-    def retrieve(self, request, *args, **kwargs):
-        # Override the retrieve method to include all translations for a single FAQ
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
+    def list(self, request, *args, **kwargs):
+        # Make sure this method returns DRF Response
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)  # Ensure this is a DRF Response
 
 def faq_list(request):
     lang = request.GET.get('lang', 'en')  # Get the selected language
