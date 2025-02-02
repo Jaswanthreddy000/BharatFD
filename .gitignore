@@ -7,3 +7,6 @@ build/
 db.sqlite3
 dump.rdb
 staticfiles/
+db.sqlite3
+dump.rdb
+staticfiles/
